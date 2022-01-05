@@ -4,9 +4,11 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.twitter.finagle.Http;
 import com.twitter.finagle.Service;
+import com.twitter.finagle.ServiceFactory;
 import com.twitter.finagle.http.Method;
 import com.twitter.finagle.http.Request;
 import com.twitter.finagle.http.Response;
+import com.twitter.util.Await;
 import com.twitter.util.Future;
 import nl.orhun.rest.RestApplication;
 import nl.orhun.rest.Vehicle;
@@ -38,6 +40,22 @@ public class FinagleClientTest {
         request.headerMap().put("host", "localhost");
 
         Future<Response> responseFuture = httpService.apply(request);
+        CompletableFuture<Response> completableFuture = responseFuture.toCompletableFuture();
+        Response response = completableFuture.join();
+
+        Assertions.assertEquals(200, response.statusCode());
+        System.out.println(request);
+        System.out.println(response.getContentString());
+    }
+
+    @Test
+    void finagleClientGet() throws Exception {
+        Request request = Request.apply(Method.Get(), "/vehicles?foo=bar");
+        request.headerMap().put("host", "localhost");
+
+        ServiceFactory<Request, Response> client = Http.newClient("localhost:" + randomServerPort);
+        Future<Service<Request, Response>> apply = client.apply();
+        Future<Response> responseFuture = Await.result(apply).apply(request);
         CompletableFuture<Response> completableFuture = responseFuture.toCompletableFuture();
         Response response = completableFuture.join();
 
