@@ -81,4 +81,22 @@ public class FinagleClientTest {
         System.out.println(request);
         System.out.println(response.getContentString());
     }
+
+    @Test
+    void finaglePut() throws JsonProcessingException {
+        Service<Request, Response> httpService = Http.newService("localhost:" + randomServerPort);
+
+        Request request = Request.apply(Method.Put(), "/vehicles?foo=bar");
+        request.headerMap().put("host", "localhost");
+        request.setContentTypeJson();
+        request.setContentString(objectMapper.writeValueAsString(vehiclePayload));
+
+        Future<Response> responseFuture = httpService.apply(request);
+        CompletableFuture<Response> completableFuture = responseFuture.toCompletableFuture();
+        Response response = completableFuture.join();
+
+        Assertions.assertEquals(200, response.statusCode());
+        System.out.println(request);
+        System.out.println(response.getContentString());
+    }
 }
