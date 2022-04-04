@@ -15,7 +15,7 @@ public class Vehicle {
     private final String model;
     private final String year;
 
-    public Vehicle(@JsonProperty("brand") String brand, @JsonProperty String model, String year) {
+    public Vehicle(@JsonProperty("brand") String brand, @JsonProperty("model") String model, @JsonProperty("year") String year) {
         this.brand = brand;
         this.model = model;
         this.year = year;
